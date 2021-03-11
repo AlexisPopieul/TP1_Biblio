@@ -1,5 +1,6 @@
 # include "biblio.h"
 
+
 void init (T_Bibliotheque *ptrB)
 {
 
@@ -238,12 +239,11 @@ int emprunterLivre (T_Bibliotheque *ptrB){
 	T_Emp NomEmp;
 	T_Code RepCode;
 
-	lireChaine("TITRE DU LIVRE A EMPRUNTER : ", LivreEmp, MAX_TITRE);
-
 	int i;
 	int rangP=0;
 	int posSup[CAPACITE_BIBLIO];
 
+	lireChaine("TITRE DU LIVRE A EMPRUNTER : ", LivreEmp, MAX_TITRE);
 
 	//Compte le nombre de livres trouvés et affiche les positions + affiche les livres
 	printf("Livres trouvés : \n");
@@ -263,30 +263,194 @@ int emprunterLivre (T_Bibliotheque *ptrB){
 	}
 
 	if (rangP==1){
-		lireChaine("NOM DE L EMPRUNTEUR : ", NomEmp, MAX);
-		strcpy(ptrB->etagere[posSup[rangP-1]].emprunteur,NomEmp);
-		return 1;
+
+		if (strcmp(ptrB->etagere[posSup[rangP-1]].emprunteur,"\0")==0){
+			printf("le champs emprunteur est vide \n");
+			lireChaine("NOM DE L EMPRUNTEUR : ", NomEmp, MAX);
+			strcpy(ptrB->etagere[posSup[rangP-1]].emprunteur,NomEmp);
+			return 1;
+		}
+
+		else {
+			printf("le champs emprunteur est déjà occupé\n");
+			return 0;
+		}
 
 	}
 
 	if (rangP>1){
+
+		printf("Plusieurs livres ont été trouvés \n");
+
 		lireChaine("CODE DU LIVRE A EMPRUNTER", RepCode,MAX_CODE);
-		lireChaine("NOM DE L EMPRUNTEUR : ", NomEmp, MAX);
+		
 
 		for (i=0;i<ptrB->nbLivres;i++){
-			if (strcmp(ptrB->etagere[i].code,RepCode)==0)
-			strcpy(ptrB->etagere[i].emprunteur,NomEmp);
+			if (strcmp(ptrB->etagere[i].code,RepCode)==0){
+
+				if (strcmp(ptrB->etagere[i].emprunteur,"\0")==0){
+					printf("le champs emprunteur est vide \n");
+					lireChaine("NOM DE L EMPRUNTEUR : ", NomEmp, MAX);
+					strcpy(ptrB->etagere[i].emprunteur,NomEmp);
+				}
+				else {
+					printf("le champs emprunteur est déjà occupé\n");
+					return 0;
+				}
+			}
 		}
-
 	}
-	
-	// if (strcmp(ptrB->etagere[rep].emprunteur,"")==0){
-	// 	printf("vous pouvez emprunter le livre");
-
-	// }
-
-
-
 return 1;
 
+}
+
+
+int rendreLivre (T_Bibliotheque *ptrB) {
+
+	T_Emp NomAbonne;
+	T_Code CodeRendu;
+
+	int i;
+	int choixAbonne;
+	int occurence=0;
+
+	lireChaine("NOM DE L'ABONNE QUI VIENT RENDRE SON/SES LIVRE(S) : ", NomAbonne , MAX);
+
+	printf("Liste des livres que l'abonne a emprunté : \n");
+
+	for (i=0 ; i<ptrB->nbLivres ; i++){
+
+		if (strcmp(ptrB->etagere[i].emprunteur , NomAbonne)==0){
+			afficherLivre(&(ptrB->etagere[i]));
+			occurence++;
+
+		}
+	}
+
+	if (occurence==0){
+		printf("l'emprunteur n'a pas emprunter de livre \n");
+		return 0;
+	}
+
+	printf("L'abonne veut rendre tous ses livres ou un seul à la fois ? 1 pour un livre à la fois ou 2 pour tous les livres \n");
+	scanf("%d", &choixAbonne);
+	 
+	if (choixAbonne==1){
+		getchar();
+		//fflush(stdin);
+
+		lireChaine("CODE DU LIVRE QUE L ABONNE VEUT RENDRE : ", CodeRendu , MAX_CODE);
+
+		for (i=0 ; i<ptrB->nbLivres ; i++){
+			if ( strcmp (ptrB->etagere[i].code,CodeRendu)==0){
+				strcpy(ptrB->etagere[i].emprunteur,"\0");
+				return 1;
+			}
+		}
+	}
+
+	if (choixAbonne==2){
+		printf("l'abonne rend tous ses livres");
+
+		for (i=0 ; i<ptrB->nbLivres ; i++){
+			strcpy(ptrB->etagere[i].emprunteur,"\0");
+			return 1;
+		}
+	}
+	return 1;
+}
+
+
+void tri_titre(T_Bibliotheque  *ptrB)
+{
+    int i; int j;
+	T_Titre taux;
+	T_Titre taux2;
+    T_livre aux;
+    printf("nb %d", ptrB->nbLivres);
+
+    for (j=1;j<(ptrB->nbLivres);j++) {
+
+
+        for (i=0 ; i < ((ptrB->nbLivres)-1) ;i++)
+        {
+            //taux=ptrB->etagere[i].titre;
+			strcpy(taux,ptrB->etagere[i].titre);
+            passerEnMaj(ptrB->etagere[i].titre,taux);
+
+            //taux2=ptrB->etagere[i+1].titre;
+			strcpy(taux2,ptrB->etagere[i+1].titre);
+            passerEnMaj(ptrB->etagere[i+1].titre,taux2);
+			
+            if (strcmp(taux,taux2)>0)
+            {
+                aux=ptrB->etagere[i];
+                ptrB->etagere[i]=ptrB->etagere[i+1];
+                ptrB->etagere[i+1]=aux;
+
+            }
+        }
+
+    }
+}
+
+void tri_auteur(T_Bibliotheque  *ptrB)
+{
+    int i; int j;
+    T_Aut autx;T_Aut autx2;
+    T_livre aux;    
+
+    for (j=1;j<(ptrB->nbLivres);j++) {
+
+    
+        for (i=0 ; i < ((ptrB->nbLivres)-1) ;i++)
+        {
+            strcpy(autx,ptrB->etagere[i].auteur);
+            passerEnMaj(ptrB->etagere[i].auteur,autx);            
+
+            strcpy(autx2,ptrB->etagere[i+1].auteur);
+            passerEnMaj(ptrB->etagere[i+1].auteur,autx2);
+            if (strcmp(autx,autx2)>0)
+            {
+                aux=ptrB->etagere[i];
+                ptrB->etagere[i]=ptrB->etagere[i+1];
+                ptrB->etagere[i+1]=aux;
+
+            
+            
+            }
+        }
+
+    }
+}
+
+void tri_annee(T_Bibliotheque  *ptrB)
+{
+    int i; int j;
+    T_livre aux;    
+
+    for (j=1;j<(ptrB->nbLivres);j++) {
+    
+        for (i=0 ; i < ((ptrB->nbLivres)-1) ;i++)
+        {
+            if (ptrB->etagere[i].annee>ptrB->etagere[i+1].annee)
+            {
+                aux=ptrB->etagere[i];
+                ptrB->etagere[i]=ptrB->etagere[i+1];
+                ptrB->etagere[i+1]=aux;
+
+            
+            
+            }
+        }
+
+    }
+}
+
+void passerEnMaj ( char* src, char*dest) {
+    for ( int i = 0; i< ((int)strlen(src)); i++) {
+
+        dest[i]=toupper(src[i]);
+
+    }
 }

@@ -31,6 +31,11 @@ void sauvegarde(T_Bibliotheque *ptrB);
 void chargement(T_Bibliotheque *ptrB);
 
 int emprunterLivre (T_Bibliotheque *ptrB);
+int rendreLivre (T_Bibliotheque *ptrB);
 
+void tri_titre(T_Bibliotheque  *ptrB);
+void tri_auteur(T_Bibliotheque  *ptrB);
+void tri_annee(T_Bibliotheque  *ptrB);
+void passerEnMaj ( char* src, char*dest);
 
 #endif

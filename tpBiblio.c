@@ -104,12 +104,30 @@ switch(chx)
 			
 			break;
 
+	case 7 : reponse = rendreLivre(&B);
+			if (reponse==0){
+				printf("Echec de la restitution livre(s)");
+			}
+			if (reponse==1){
+				printf("La restitution livre(s) a réussi");
+			}
+			
+			break;
 
-	
-	
-	
-	
-	
+	case 8 : tri_titre (&B);
+			printf("On trie les livres par titre...");
+			
+			break;
+
+	case 9 : tri_auteur (&B);
+			printf("on trie les livres par auteur...");
+			
+			break;
+
+	case 10 : tri_annee (&B);
+			printf("On trie les livres pas année...");
+
+			break;
 	}
 
 }while(chx!=0);
